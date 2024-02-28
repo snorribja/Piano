@@ -38,23 +38,18 @@ document.addEventListener('keyup', (event) => {
 
 
 const fetchSongs = async () => {
-    try {
-        const response = await axios.get(url);
-        const songs = response.data;
+    const response = await axios.get(url);
+    const songs = response.data;
 
-        const tunesDropdown = document.getElementById('tunesDrop');
-        tunesDropdown.innerHTML = '';
+    const tunesDropdown = document.getElementById('tunesDrop');
+    tunesDropdown.innerHTML = '';
 
-        songs.forEach(song => {
-            const option = document.createElement('option');
-            option.value = song.id; 
-            option.textContent = song.name; 
-            tunesDropdown.appendChild(option);
-        });
-
-    } catch (error) {
-        console.error(error);
-    }
+    songs.forEach(song => {
+        const option = document.createElement('option');
+        option.value = song.id; 
+        option.textContent = song.name; 
+        tunesDropdown.appendChild(option);
+    });
 };
 
 fetchSongs();
@@ -64,20 +59,15 @@ fetchSongs();
 const playSong = async () => {
     const tunesDropdown = document.getElementById('tunesDrop');
     const selectedTuneId = tunesDropdown.value; 
+    const response = await axios.get(url);
+    const tunes = response.data;
 
-    try {
-        const response = await axios.get(url);
-        const tunes = response.data;
-
-        const selectedTune = tunes.find(tune => tune.id === selectedTuneId); 
-        selectedTune.tune.forEach(noteObj => {
-            setTimeout(() => {
-                playNote(noteObj.note, noteObj.duration);
-            }, noteObj.timing * 1000);
-        });
-    } catch (error) {
-        console.error(error);
-    }
+    const selectedTune = tunes.find(tune => tune.id === selectedTuneId); 
+    selectedTune.tune.forEach(noteObj => {
+        setTimeout(() => {
+            playNote(noteObj.note, noteObj.duration);
+        }, noteObj.timing * 1000);
+    });
 };
 
 document.getElementById('tunebtn').addEventListener('click', playSong);
@@ -106,24 +96,18 @@ const stopRecording = () => {
     if (!recordingName) {
         recordingName = 'No-name Tune';
     }
-    console.log('Recording stopped. Recorded song:', { name: recordingName, tune: recordedNotes });
     if (recordedNotes.length) {
         postTune(recordingName, recordedNotes); 
     }
 };
 
 const postTune = async (name, notes) => {
-    try {
-        const response = await axios.post(url, {
-            id: Date.now().toString(),  // hvernig makear þetta bara sense
-            name: name,
-            tune: notes
-        });
-        console.log('Tune posted:', response.data);
-        fetchSongs(); 
-    } catch (error) {
-        console.error(error);
-    }
+    const response = await axios.post(url, {
+        id: Date.now().toString(),
+        name: name,
+        tune: notes
+    });
+    fetchSongs(); 
 };
 
 
@@ -131,5 +115,3 @@ const postTune = async (name, notes) => {
 document.getElementById('recordbtn').addEventListener('click', startRecording);
 document.getElementById('stopbtn').addEventListener('click', stopRecording);
 document.getElementById('stopbtn').disabled = true;
-
-// líka á tóninn að spilast þegar ýtt er á takkan eða þegar takkanum er slept!?!?!?!
